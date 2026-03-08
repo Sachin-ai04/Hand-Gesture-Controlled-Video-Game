@@ -3,7 +3,7 @@
 A wearable gesture controller that maps hand movements to game inputs using an MPU-6050 accelerometer/gyroscope and an ESP32 microcontroller.
 
 ## 🎥 Demo
-![Project Demo]
+https://www.linkedin.com/posts/sachin-kushwaha-74b011325_electronics-iot-esp32-activity-7436296950792060928-apqI?utm_source=social_share_send&utm_medium=android_app&rcm=ACoAAFIMq-sB0gRAdNXELOVNfxtqT5caFzbdd5o&utm_campaign=copy_link
 
 ## 🛠️ Hardware Used
 * **Microcontroller:** ESP32 (DOIT DEVKIT V1)
