@@ -1,0 +1,70 @@
+#include <BleKeyboard.h>
+#include <Wire.h>
+#include <esp_wifi.h> // Needed for the ID spoofing
+
+// We name it something distinct so you can find it easily
+BleKeyboard bleKeyboard("Pro Controller", "ESP32", 100);
+
+// MPU6050 Settings
+const int MPU_ADDR = 0x68;
+int16_t ax, ay, az;
+
+// SENSITIVITY: 6500
+const int THRESHOLD = 6500; 
+
+void setup() {
+  Serial.begin(115200);
+
+  // ---------------------------------------------------------
+  uint8_t new_mac[8] = {0x02, 0x01, 0x02, 0x03, 0x04, 0x05}; 
+  esp_base_mac_addr_set(new_mac);
+  // ---------------------------------------------------------
+
+  // Start MPU6050
+  Wire.begin();
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B); 
+  Wire.write(0);    
+  Wire.endTransmission(true);
+
+  Serial.println("Starting Bluetooth with Custom ID...");
+  bleKeyboard.begin();
+  Serial.println("Waiting for connection...");
+}
+
+void loop() {
+  // Read Sensor
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B); 
+  Wire.endTransmission(false);
+  Wire.requestFrom((uint16_t)MPU_ADDR, (uint8_t)6, true);
+  
+  if (Wire.available() >= 6) {
+    ax = (Wire.read() << 8 | Wire.read()); 
+    ay = (Wire.read() << 8 | Wire.read()); 
+    az = (Wire.read() << 8 | Wire.read()); 
+  }
+
+  if(bleKeyboard.isConnected()) {
+    // RIGHT
+    if (ax > THRESHOLD) {
+      bleKeyboard.write(KEY_RIGHT_ARROW);
+      delay(250); 
+    }
+    // LEFT
+    else if (ax < -THRESHOLD) {
+      bleKeyboard.write(KEY_LEFT_ARROW);
+      delay(250);
+    }
+    // JUMP
+    else if (ay > THRESHOLD) {
+      bleKeyboard.write(KEY_UP_ARROW);
+      delay(250);
+    }
+    // SLIDE
+    else if (ay < -THRESHOLD) {
+      bleKeyboard.write(KEY_DOWN_ARROW);
+      delay(250);
+    }
+  }
+}
